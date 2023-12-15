@@ -2,7 +2,10 @@ package com.javatechie.service;
 
 import com.javatechie.entity.Product;
 import com.javatechie.respository.ProductRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +19,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
+@Slf4j
+//@CacheConfig(cacheNames = "products")
 public class ProductService {
 
     @Autowired
@@ -30,6 +35,7 @@ public class ProductService {
         repository.saveAll(products);
     }
 
+    @CachePut(cacheNames = "products", key = "#product.id")
     public Product saveProduct(Product product) {
         return repository.save(product);
     }
@@ -37,10 +43,13 @@ public class ProductService {
 
     @Cacheable(cacheNames = "products")
     public List<Product> getProducts() {
+        log.info("ProductService::getProduct() connecting to Database");
         return repository.findAll();
     }
 
+    @Cacheable(cacheNames = "products",key = "#id")
     public Product getProductById(int id) {
+        log.info("ProductService::getProductById() connecting to Database");
         return repository.findById(id).get();
     }
 
@@ -60,6 +69,7 @@ public class ProductService {
         return repository.getProductByPrice(price);
     }
 
+    @CachePut(cacheNames = "products", key = "#id")
     public Product updateProduct(int id, Product productRequest) {
         // get the product from DB by id
         // update with new value getting from request
