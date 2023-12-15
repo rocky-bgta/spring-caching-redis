@@ -5,6 +5,7 @@ import com.javatechie.respository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -81,6 +82,7 @@ public class ProductService {
         return repository.save(existingProduct);
     }
 
+    @CacheEvict(cacheNames = "products", key = "#id")
     public long deleteProduct(int id) {
         repository.deleteById(id);
         return repository.count();
