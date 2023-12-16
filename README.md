@@ -1,9 +1,9 @@
 # spring-data-jpa
+/* not required now as redis included in docker-compose.yml file
+  ~~Before run this project install redis via docker via the following command:
 
-Before run this project install redis via docker via the following command:
-
-docker run -d --name redis-stack-server -p 6379:6379 redis/redis-stack-server:latest
-
+ docker run -d --name redis-stack-server -p 6379:6379 redis/redis-stack-server:latest~~
+*/
 Then run the redis-stack-server docker container.
 
 # To build Docker image give below cmd (salehinrocky docker user name):
