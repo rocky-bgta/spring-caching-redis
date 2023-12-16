@@ -10,4 +10,9 @@ Then run the redis-stack-server docker container.
 * docker build -t salehinrocky/spring-boot-caching-redis:1.0.0 .
 # To run build image to give the following cmd:
 * docker run -p 8080:9191 salehinrocky/spring-boot-caching-redis:1.0.0
+# To give name of running container from an image give the following cmd: 
+* docker run -p 8080:9191 --name spring-boot-caching-redis salehinrocky/spring-boot-caching-redis:1.0.0
 _Here salehinrocky/spring-boot-caching-redis:1.0.0 is given image name_
+
+# To test api that run inside docker container 
+* use "host.docker.internal" instead localhost
