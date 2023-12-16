@@ -4,7 +4,7 @@ spring:
       mode: never
   datasource:
     driver-class-name:  com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/javatechie
+    url: jdbc:mysql://localhost:3306/javatechie?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
     username: root
     password: root
 

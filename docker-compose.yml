@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  app:
+    image: salehinrocky/spring-boot-caching-redis:1.0.0
+    ports:
+      - "8080:9191"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/javatechie?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0.27
+    environment:
+      DATABASE_HOST: docker-mysql
+      DATABASE_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: javatechie
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: root
+
+
+
