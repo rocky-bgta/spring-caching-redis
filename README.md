@@ -1,10 +1,10 @@
 # Spring Boot Redis Caching Demo
 
-A Java 8 / Spring Boot 2.7 sample combining MySQL-backed Spring Data JPA with Redis. This repository is a learning demo, not a production-ready template.
+A Java 17 / Spring Boot 3.5 sample combining MySQL-backed Spring Data JPA with Redis. This repository is a learning demo, not a production-ready template.
 
 ## Prerequisites
 
-- JDK 8 and Maven
+- JDK 17 and Maven
 - MySQL with a database named `javatechie`
 - Redis (the application defaults to hostname `redis`, which is suitable for a matching Docker Compose service)
 
@@ -42,6 +42,6 @@ When running a container, provide `DB_PASSWORD`, `DB_URL`, and `REDIS_HOST` for 
 
 ## Engineering notes
 
-- This example currently uses Spring Boot 2.7 and Java 8. Upgrading to a supported Spring Boot and Java baseline is a separate change that should include compatibility testing.
+- This example targets Spring Boot 3.5 and Java 17. Full MySQL/Redis integration and container compatibility still require verification.
 - Database schema updates are enabled through `spring.jpa.hibernate.ddl-auto=update`; avoid this setting in production.
 - The example does not claim production readiness or verified CI coverage.
