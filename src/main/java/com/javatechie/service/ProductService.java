@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -35,7 +36,8 @@ public class ProductService {
         repository.saveAll(products);
     }
 
-    @CachePut(cacheNames = "products", key = "#product.id")
+    @Caching(put = @CachePut(cacheNames = "products", key = "#result.id"),
+            evict = @CacheEvict(cacheNames = "products", key = "T(org.springframework.cache.interceptor.SimpleKey).EMPTY"))
     public Product saveProduct(Product product) {
         return repository.save(product);
     }
@@ -69,7 +71,8 @@ public class ProductService {
         return repository.getProductByPrice(price);
     }
 
-    @CachePut(cacheNames = "products", key = "#id")
+    @Caching(put = @CachePut(cacheNames = "products", key = "#id"),
+            evict = @CacheEvict(cacheNames = "products", key = "T(org.springframework.cache.interceptor.SimpleKey).EMPTY"))
     public Product updateProduct(int id, Product productRequest) {
         // get the product from DB by id
         // update with new value getting from request
@@ -77,11 +80,14 @@ public class ProductService {
         existingProduct.setName(productRequest.getName());
         existingProduct.setDescription(productRequest.getDescription());
         existingProduct.setPrice(productRequest.getPrice());
-        existingProduct.setProductType(existingProduct.getProductType());
+        existingProduct.setProductType(productRequest.getProductType());
         return repository.save(existingProduct);
     }
 
-    @CacheEvict(cacheNames = "products", key = "#id")
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "products", key = "#id"),
+            @CacheEvict(cacheNames = "products", key = "T(org.springframework.cache.interceptor.SimpleKey).EMPTY")
+    })
     public long deleteProduct(int id) {
         repository.deleteById(id);
         return repository.count();
