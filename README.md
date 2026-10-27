@@ -41,7 +41,7 @@ mvn spring-boot:run
 
 The isolated Mockito/JUnit unit tests do not need MySQL or Redis. The existing `@SpringBootTest` context test does require configured infrastructure; running the **full** `mvn test` suite without it may fail. The GitHub Actions unit-test job deliberately selects `ProductServiceTest` only.
 
-## CI and engineering notes
+## Cache consistency\n\nThe `products` cache stores individual products by their persisted database ID and the full `GET /products` result under Spring's default no-argument cache key. Creating, updating, or deleting a product invalidates the cached list; updates refresh the individual product entry, and deletions evict it. The save path uses the **persisted ID** (not a new entity's initial ID).\n\nThe isolated unit-test job now also exercises these cache annotations through a real Spring cache proxy with an in-memory `ConcurrentMapCacheManager`. It does **not** prove Redis serialization, network connectivity, or cross-instance invalidation.\n\n## CI and engineering notes
 
 GitHub Actions runs isolated service tests on Java 17 and checks that the container image builds. Docker Compose configuration is validated with the sample environment file; this is **not** a live MySQL/Redis integration test.
 
