@@ -1,47 +1,52 @@
 # Spring Boot Redis Caching Demo
 
-A Java 17 / Spring Boot 3.5 sample combining MySQL-backed Spring Data JPA with Redis. This repository is a learning demo, not a production-ready template.
+A **Java 17 / Spring Boot 3.5** learning example combining Spring Data JPA (MySQL) with Redis-backed caching. The project is a demonstration, not a production-ready service.
 
-## Prerequisites
+## Quick start with Docker Compose
 
-- JDK 17 and Maven
-- MySQL with a database named `javatechie`
-- Redis (the application defaults to hostname `redis`, which is suitable for a matching Docker Compose service)
+Requires Docker with Compose v2. No local Java, Maven, MySQL, or Redis installation is needed for this route.
 
-## Configuration
+```bash
+cp .env.example .env
+# Edit .env and replace BOTH example passwords with different, strong local values.
+docker compose up --build -d
+docker compose ps
+```
 
-The application reads its database password from the environment; no password is committed to source control.
+The app is available on **http://localhost:8080** (container port 9191). MySQL and Redis are accessible only on the Compose network; they are not published to the host. The MySQL data is stored in the `mysql_data` named volume.
+
+```bash
+docker compose logs -f app
+docker compose down
+# To delete the local database volume too: docker compose down -v
+```
+
+The Compose configuration builds the current source code using **Java 17**, rather than pulling the older prebuilt Java 8 image. Database and Redis health checks gate application startup. Passwords are read from an untracked `.env` file; do not use the sample values outside local development.
+
+## Run locally without Docker
+
+Requires JDK 17, Maven, a running MySQL server with a `javatechie` database, and Redis.
 
 | Variable | Purpose | Default |
 |---|---|---|
 | `DB_PASSWORD` | **Required** MySQL password | none |
 | `DB_USERNAME` | MySQL username | `root` |
-| `DB_URL` | JDBC connection URL | `jdbc:mysql://localhost:3306/javatechie` |
-| `REDIS_HOST` | Redis hostname | `redis` |
+| `DB_URL` | JDBC URL | `jdbc:mysql://localhost:3306/javatechie` |
+| `REDIS_HOST` | Redis host | `redis` |
 
-For a locally installed Redis server, set `REDIS_HOST=localhost`. Set environment variables in your shell or IDE run configuration. Avoid committing real credentials.
-
-## Run
+Set `REDIS_HOST=localhost` when Redis runs directly on your machine, and provide `DB_PASSWORD` through the environment.
 
 ```bash
-mvn test
+mvn -B -Dtest=ProductServiceTest test
 mvn spring-boot:run
 ```
 
-The application listens on port **9191** by default. Check the source controllers for the available endpoints.
+The isolated Mockito/JUnit unit tests do not need MySQL or Redis. The existing `@SpringBootTest` context test does require configured infrastructure; running the **full** `mvn test` suite without it may fail. The GitHub Actions unit-test job deliberately selects `ProductServiceTest` only.
 
-## Docker
+## CI and engineering notes
 
-The existing Dockerfile can be used to build an image:
+GitHub Actions runs isolated service tests on Java 17 and checks that the container image builds. Docker Compose configuration is validated with the sample environment file; this is **not** a live MySQL/Redis integration test.
 
-```bash
-docker build -t spring-boot-caching-redis:local .
-```
-
-When running a container, provide `DB_PASSWORD`, `DB_URL`, and `REDIS_HOST` for services reachable from that container; `localhost` inside a container does **not** refer to the host machine. Example port mapping: `-p 8080:9191`.
-
-## Engineering notes
-
-- This example targets Spring Boot 3.5 and Java 17. Full MySQL/Redis integration and container compatibility still require verification.
-- Database schema updates are enabled through `spring.jpa.hibernate.ddl-auto=update`; avoid this setting in production.
-- The example does not claim production readiness or verified CI coverage.
+- `spring.jpa.hibernate.ddl-auto=update` is for demo convenience, not production schema management.
+- Cache consistency, connection recovery, secret management, and real broker/database integration tests still need production-oriented treatment.
+- Credentials in `.env` are for local development only; never commit real secrets.
