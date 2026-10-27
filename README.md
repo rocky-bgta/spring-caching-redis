@@ -7,8 +7,6 @@ A **Java 17 / Spring Boot 3.5** learning example combining Spring Data JPA (MySQ
 Requires Docker with Compose v2. No local Java, Maven, MySQL, or Redis installation is needed for this route.
 
 ```bash
-cp .env.example .env
-# Edit .env and replace BOTH example passwords with different, strong local values.
 docker compose up --build -d
 docker compose ps
 ```
@@ -21,7 +19,7 @@ docker compose down
 # To delete the local database volume too: docker compose down -v
 ```
 
-The Compose configuration builds the current source code using **Java 17**, rather than pulling the older prebuilt Java 8 image. Database and Redis health checks gate application startup. Passwords are read from an untracked `.env` file; do not use the sample values outside local development.
+The Compose configuration builds the current source code using **Java 17**, rather than pulling the older prebuilt Java 8 image. Database and Redis health checks gate application startup. The tracked `.env` contains public demo-only passwords and is loaded by Docker Compose. Never put real credentials in this file.
 
 ## Run locally without Docker
 
@@ -49,4 +47,4 @@ GitHub Actions runs isolated service tests on Java 17 and checks that the contai
 
 - `spring.jpa.hibernate.ddl-auto=update` is for demo convenience, not production schema management.
 - Cache consistency, connection recovery, secret management, and real broker/database integration tests still need production-oriented treatment.
-- Credentials in `.env` are for local development only; never commit real secrets.
+- The tracked `.env` contains demo credentials only; never commit real secrets.
