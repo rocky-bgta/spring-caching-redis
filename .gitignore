@@ -23,8 +23,7 @@
 hs_err_pid*
 replay_pid*
 
-# Local credentials and build outputs
-.env
+# Tracked .env contains demo credentials only; ignore other environment files.
 .env.*
 !.env.example
 target/
