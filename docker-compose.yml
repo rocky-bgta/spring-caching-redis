@@ -1,30 +1,42 @@
-version: '3.8'
-
 services:
   app:
-    image: salehinrocky/spring-boot-caching-redis:1.0.0
+    build: .
     ports:
       - "8080:9191"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/javatechie?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
-      SPRING_DATASOURCE_USERNAME: admin
-      SPRING_DATASOURCE_PASSWORD: root
+      DB_URL: jdbc:mysql://db:3306/javatechie?allowPublicKeyRetrieval=true&useSSL=false
+      DB_USERNAME: admin
+      DB_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in your .env file}
+      REDIS_HOST: redis
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   db:
-    image: mysql:8.0.27
+    image: mysql:8.4
     environment:
-      DATABASE_HOST: docker-mysql
-      DATABASE_PORT: 3306
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in your .env file}
       MYSQL_DATABASE: javatechie
       MYSQL_USER: admin
-      MYSQL_PASSWORD: root
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in your .env file}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -h localhost -u root -p\"$$MYSQL_ROOT_PASSWORD\" -e 'SELECT 1' >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
 
   redis:
-    image: redis
-    ports:
-      - "6379:6379"
+    image: redis:7.4-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
+volumes:
+  mysql_data:
