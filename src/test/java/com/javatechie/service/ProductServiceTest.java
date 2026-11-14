@@ -13,6 +13,8 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -49,6 +51,32 @@ class ProductServiceTest {
 
         assertSame(product, service.getProductById(1));
         verify(repository).findById(1);
+    }
+
+    @Test
+    void getProductByIdReturnsNotFoundWhenProductDoesNotExist() {
+        when(repository.findById(99)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.getProductById(99));
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        verify(repository).findById(99);
+    }
+
+    @Test
+    void updateProductReturnsNotFoundWithoutSavingWhenProductDoesNotExist() {
+        when(repository.findById(99)).thenReturn(Optional.empty());
+        Product request = new Product(99, "new", 20, "description", "type");
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.updateProduct(99, request));
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        verify(repository).findById(99);
+        verify(repository, never()).save(any(Product.class));
     }
 
     @Test
