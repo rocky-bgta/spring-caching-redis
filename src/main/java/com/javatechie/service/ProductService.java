@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Random;
@@ -52,7 +54,9 @@ public class ProductService {
     @Cacheable(cacheNames = "products",key = "#id")
     public Product getProductById(int id) {
         log.info("ProductService::getProductById() connecting to Database");
-        return repository.findById(id).get();
+        return repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Product not found: " + id));
     }
 
     public Product getProductByName(String name) {
@@ -76,7 +80,9 @@ public class ProductService {
     public Product updateProduct(int id, Product productRequest) {
         // get the product from DB by id
         // update with new value getting from request
-        Product existingProduct = repository.findById(id).get(); // DB
+        Product existingProduct = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Product not found: " + id));
         existingProduct.setName(productRequest.getName());
         existingProduct.setDescription(productRequest.getDescription());
         existingProduct.setPrice(productRequest.getPrice());
